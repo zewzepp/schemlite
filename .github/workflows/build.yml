@@ -1,0 +1,18 @@
+name: build-from-zip
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir proj && unzip -q schemlite.zip -d proj
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 25 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '9.2.1' }
+      - run: gradle build --stacktrace
+        working-directory: proj
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schemlite-jar
+          path: proj/build/libs/*.jar
